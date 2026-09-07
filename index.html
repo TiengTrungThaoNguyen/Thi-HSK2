@@ -200,7 +200,7 @@
 /* ================= STATE ================= */
 // Link Web App (Apps Script) đã Deploy cho hệ thống HSK2 — sửa lại đúng link
 // của bạn sau khi Deploy Code_HSK2.gs.
-const API_URL = 'https://script.google.com/macros/s/AKfycbxZ13a6F0pLo31aYKDZ7mOi23j0RZBdOmWlmT2x0LbT_XA6MBdAF72J60TixD1-Z3u3zQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzoCyPT3Wq1hcKKaMDy0wKoSM5phXagwAYg_u_eMIbmZngVdubKwj9BaLaItt6k7cXgYA/exec';
 let DATA = null;
 let currentLesson = '';
 let hoTen = '';
@@ -457,14 +457,18 @@ function renderVietP1(part){
   });
   return h;
 }
-/* ---- Viet P2 (câu 56-60): viết chữ Hán còn thiếu, có gợi ý phiên âm ---- */
+/* ---- Viet P2 (câu 56-60): viết chữ Hán còn thiếu — "pinyin" là phiên âm
+   CẢ CÂU cho sẵn (hiện 1 dòng nhỏ phía trên câu), "blankPinyin" là phiên âm
+   riêng của CHỖ TRỐNG (hiện ngay phía trên ô nhập, gợi ý cách đọc chữ Hán
+   còn thiếu) ---- */
 function renderVietP2(part){
   const items = part.items;
   const h1 = heading('viet_p2', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
     h += `<div class="qRow"><span class="qNum">${it.id}.</span>
-      <div class="fillLine">${it.before}<span class="pinyinWrap"><span class="py">${it.pinyin}</span><span class="blankRow">（<input type="text" maxlength="3" class="hanziInput" data-qid="${it.id}" autocomplete="off">）</span></span>${it.after}</div>
+      ${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}
+      <div class="fillLine">${it.before}<span class="pinyinWrap"><span class="py">${it.blankPinyin||''}</span><span class="blankRow">（<input type="text" maxlength="3" class="hanziInput" data-qid="${it.id}" autocomplete="off">）</span></span>${it.after}</div>
     </div>`;
   });
   return h;
