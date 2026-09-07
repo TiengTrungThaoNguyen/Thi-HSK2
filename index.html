@@ -65,15 +65,9 @@
 
   h2.skillHeading{ font-family:"Noto Serif SC","Noto Serif",serif; font-weight:700; font-size:1.3rem; text-align:center; margin:36px 0 16px; text-wrap:balance; }
   h2.skillHeading .vi{ display:block; font-family:"Be Vietnam Pro",sans-serif; font-weight:600; font-size:.85rem; color:var(--ink-muted); margin-top:2px; }
-  .audioBar{ position:sticky; top:64px; z-index:20; background:var(--surface); border:1px solid var(--border); border-left:5px solid var(--nghe-accent); border-radius:10px; padding:14px 16px; margin-bottom:18px; box-shadow:var(--shadow); font-family:"Be Vietnam Pro",sans-serif; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-  .audioBar .label{ font-weight:700; font-size:.92rem; }
-  .audioBar .sub{ font-size:.78rem; color:var(--ink-muted); }
-  .audioTrack{ flex:1 1 160px; min-width:120px; height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
-  .audioTrack .fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--brand-dark),var(--brand-bright)); transition:width .2s linear; }
   .btn{ font-family:"Be Vietnam Pro",sans-serif; font-weight:600; font-size:.85rem; border:none; border-radius:8px; padding:9px 16px; cursor:pointer; background:linear-gradient(135deg,var(--brand-dark) 0%,var(--brand) 60%,var(--brand-bright) 130%); color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.3); }
   .btn:hover{ background:var(--brand-dark); }
   .btn:disabled{ background:var(--surface-2); color:var(--ink-muted); cursor:not-allowed; }
-  .btn.warn{ background:var(--warning); }
   .partCard{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 20px 22px; margin-bottom:18px; box-shadow:var(--shadow); }
   .partCard.nghe{ border-top:4px solid var(--nghe-accent); }
   .partCard.doc{ border-top:4px solid var(--doc-accent); }
@@ -81,15 +75,19 @@
   .partHead{ margin-bottom:14px; }
   .partHead .zh{ font-weight:700; font-size:1.05rem; }
   .partHead .vi{ font-family:"Be Vietnam Pro",sans-serif; font-size:.85rem; color:var(--ink-muted); margin-top:2px; }
-  .blockWrap{ padding:12px 0; border-top:1px dashed var(--border); }
-  .blockWrap:first-of-type{ border-top:none; padding-top:0; }
   .qRow{ padding:14px 0; border-top:1px dashed var(--border); }
   .qRow:first-of-type{ border-top:none; }
   .qNum{ font-weight:700; color:var(--ink-muted); margin-right:6px; font-family:"Be Vietnam Pro",sans-serif; }
   .qText{ margin:4px 0 10px; }
-  .qPassage{ background:var(--surface-2); border-radius:8px; padding:10px 14px; margin-bottom:8px; }
+  .qPassage{ background:var(--surface-2); border-radius:8px; padding:10px 14px; margin-bottom:8px; white-space:pre-line; }
+  .qPinyin{ font-family:"Be Vietnam Pro",sans-serif; font-size:.8rem; color:var(--ink-muted); margin:2px 0 8px; }
+  .qAudio{ margin:6px 0 10px; }
+  .qAudio audio{ height:32px; width:100%; max-width:320px; }
+  .qPicWrap{ border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface-2); margin-bottom:12px; text-align:center; }
+  .qPicWrap img{ max-width:100%; max-height:220px; border-radius:6px; display:inline-block; }
   .bubbleRow{ display:flex; flex-wrap:wrap; gap:8px; }
-  .bubble{ font-family:"Be Vietnam Pro","Noto Sans SC",sans-serif; font-size:.88rem; font-weight:600; border:1.5px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer; }
+  .bubble{ font-family:"Be Vietnam Pro","Noto Sans SC",sans-serif; font-size:.88rem; font-weight:600; border:1.5px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer; text-align:left; }
+  .bubble .py{ display:block; font-size:.72rem; font-weight:500; color:var(--ink-muted); }
   .bubble:hover{ border-color:var(--brand); }
   .bubble.selected{ background:var(--brand-tint); border-color:var(--brand); color:var(--brand-dark); }
   .bubble.letter{ min-width:38px; text-align:center; padding:7px 0; }
@@ -99,30 +97,12 @@
   .bubble.wrong{ background:var(--danger-tint); border-color:var(--danger); color:var(--danger); }
   .bubble.wrong::after{ content:" ✕"; }
   .pool{ background:var(--surface-2); border-radius:8px; padding:12px 14px; margin-bottom:16px; display:flex; flex-direction:column; gap:6px; }
-  .pool .item{ display:flex; gap:8px; }
+  .pool .item{ display:flex; gap:8px; align-items:baseline; }
   .pool .letter{ font-weight:700; color:var(--doc-accent); min-width:1.2em; }
+  .pool .py{ font-family:"Be Vietnam Pro",sans-serif; font-size:.78rem; color:var(--ink-muted); }
   .wordbank{ display:flex; flex-wrap:wrap; gap:8px 16px; background:var(--surface-2); border-radius:8px; padding:12px 14px; margin-bottom:16px; justify-content:center; font-family:"Be Vietnam Pro",sans-serif;}
   .wordbank .letter{ color:var(--doc-accent); margin-right:4px; font-weight:700; }
-  .imagePool{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; background:var(--surface-2); border-radius:8px; padding:12px; margin-bottom:16px; }
-  .imagePool .cell{ text-align:center; }
-  .imagePool .cell img{ max-width:100%; max-height:90px; border-radius:6px; border:1px solid var(--border); background:var(--surface); }
-  .imagePool .cell .letter{ display:block; font-weight:700; color:var(--doc-accent); font-family:"Be Vietnam Pro",sans-serif; margin-top:4px; font-size:.85rem; }
-  .imgBubble{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px; border:1.5px solid var(--border); border-radius:10px; background:var(--surface); cursor:pointer; min-width:96px; }
-  .imgBubble img{ max-width:96px; max-height:80px; border-radius:6px; }
-  .imgBubble .cap{ font-family:"Be Vietnam Pro",sans-serif; font-size:.8rem; font-weight:700; color:var(--ink-muted); }
-  .imgBubble.selected{ border-color:var(--brand); background:var(--brand-tint); }
-  .imgBubble.correct{ border-color:var(--brand); background:var(--brand-tint); }
-  .imgBubble.correct .cap::after{ content:" ✓"; }
-  .imgBubble.wrong{ border-color:var(--danger); background:var(--danger-tint); }
-  .imgBubble.wrong .cap::after{ content:" ✕"; }
-  .imgBubble:disabled{ cursor:default; opacity:.85; }
-  .ngheImageWrap{ border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface-2); margin-bottom:14px; text-align:center; }
-  .ngheImageWrap img{ max-width:100%; border-radius:6px; display:inline-block; }
-  .orderAnswer{ min-height:44px; border:1.5px dashed var(--border); border-radius:8px; padding:8px; display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; background:var(--surface-2); }
-  .orderAnswer .placeholder{ color:var(--ink-muted); font-size:.85rem; font-family:"Be Vietnam Pro",sans-serif; }
-  .wordChip{ font-size:1.02rem; border:1.5px solid var(--border); background:var(--surface); border-radius:6px; padding:5px 10px; cursor:pointer; }
-  .wordChip.used{ opacity:.35; cursor:default; }
-  .orderAnswer .wordChip{ border-color:var(--brand); background:var(--brand-tint); }
+  .wordbank .py{ font-size:.78rem; color:var(--ink-muted); margin-left:4px; }
   .fillLine{ font-size:1.05rem; display:flex; align-items:flex-end; flex-wrap:wrap; gap:2px; }
   .pinyinWrap{ display:inline-flex; flex-direction:column; align-items:center; margin:0 2px; }
   .pinyinWrap .py{ font-family:"Be Vietnam Pro",sans-serif; font-size:.68rem; color:var(--ink-muted); margin-bottom:1px; }
@@ -146,7 +126,6 @@
   .resultCard .score{ font-size:2.6rem; font-weight:700; color:var(--brand); font-variant-numeric:tabular-nums; margin:8px 0 4px;}
   .resultCard .sub{ color:var(--ink-muted); font-size:.88rem; margin-bottom:14px; }
   .resultCard .row{ display:flex; justify-content:space-between; font-size:.9rem; padding:6px 0; border-top:1px dashed var(--border); }
-  .resultCard .row.penalty{ color:var(--danger); font-size:.8rem; border-top:none; padding-top:0; }
   .resultCard .btn{ margin-top:16px; }
   .hskBadge{ display:inline-block; font-weight:700; font-size:.82rem; border-radius:999px; padding:6px 14px; margin:6px 0 12px; }
   .hskBadge.pass{ background:var(--brand-tint); color:var(--brand-dark); }
@@ -199,15 +178,12 @@
     <div class="sub" id="scoreSub">/ 300 điểm</div>
     <div class="hskBadge ui" id="hskBadge"></div>
     <div class="row"><span>听力 Nghe</span><span id="rowNghe">–</span></div>
-    <div class="row penalty hidden" id="rowPenalty"><span>　(đã trừ 10đ vì bấm nghe lại)</span><span></span></div>
     <div class="row"><span>阅读 Đọc</span><span id="rowDoc">–</span></div>
     <div class="row"><span>书写 Viết</span><span id="rowViet">–</span></div>
     <button class="btn ui" id="reviewBtn">Xem lại bài làm &amp; đáp án</button>
     <div class="brandBlock"><div class="brandName">TIẾNG TRUNG THẢO NGUYÊN</div><div class="brandSub">Luyện thi HSK2</div><div class="brandSub">SĐT: 0911.715.999</div></div>
   </div>
 </div>
-
-<audio id="ngheAudio" preload="auto"></audio>
 
 <script>
 /* ================= STATE ================= */
@@ -217,10 +193,10 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxNyqP0OdC0z_cG8aIum5vN
 let DATA = null;
 let currentLesson = '';
 let hoTen = '';
-const answers = {};
-const orderState = {};
+let answers = {};
 let submitted = false;
-let replayUsed = false;
+
+/* ================= LABELS ================= */
 const PART_LABELS = {
   nghe_p1:{suffix:'题：听句子，选择相应的图片', vi:'Nghe câu và chọn bức tranh phù hợp với nội dung câu nghe được.'},
   nghe_p2:{suffix:'题：听对话，选择相应的图片', vi:'Nghe đoạn hội thoại và chọn bức tranh phù hợp.'},
@@ -233,9 +209,8 @@ const PART_LABELS = {
   viet_p2:{suffix:'题：看拼音写汉字', vi:'Căn cứ vào phiên âm để viết đúng chữ Hán còn thiếu.'}
 };
 function flattenItems(part){
-  if(part.items) return part.items;
-  if(part.blocks) return part.blocks.reduce((a,b)=>a.concat(b.items), []);
-  return [];
+  if(!part) return [];
+  return part.items || [];
 }
 function heading(key, items){
   if(!items.length) return {zh:'', vi:PART_LABELS[key].vi};
@@ -306,86 +281,70 @@ function bubbleRow(qid, options, kind){
     });
   } else if(kind==='text'){
     Object.keys(options).forEach(letter=>{
-      if(!options[letter]) return;
+      const opt = options[letter];
+      const text = (opt && typeof opt === 'object') ? opt.text : opt;
+      const pinyin = (opt && typeof opt === 'object') ? opt.pinyin : '';
+      if(!text) return;
       const sel = answers[qid]===letter ? ' selected':'';
-      html += `<button type="button" class="bubble${sel}" data-qid="${qid}" data-val="${letter}">${letter}. ${options[letter]}</button>`;
+      html += `<button type="button" class="bubble${sel}" data-qid="${qid}" data-val="${letter}">${letter}. ${text}${pinyin?`<span class="py">${pinyin}</span>`:''}</button>`;
     });
   }
   html += '</div>';
   return html;
 }
-function imageBubbleRow(qid, images){
-  let html = '<div class="bubbleRow">';
-  Object.keys(images).forEach(letter=>{
-    if(!images[letter]) return;
-    const sel = answers[qid]===letter ? ' selected':'';
-    html += `<button type="button" class="imgBubble${sel}" data-qid="${qid}" data-val="${letter}">
-      <img src="${images[letter]}" alt="${letter}"><span class="cap">${letter}</span></button>`;
-  });
-  html += '</div>';
-  return html;
+function qImage(src){
+  if(!src) return '';
+  return `<div class="qPicWrap"><img src="${src}" alt="Tranh minh hoạ"></div>`;
 }
-function imagePoolBlock(pool){
-  let html = '<div class="imagePool">';
-  Object.keys(pool).forEach(l=>{
-    if(!pool[l]) return;
-    html += `<div class="cell"><img src="${pool[l]}" alt="${l}"><span class="letter">${l}</span></div>`;
-  });
-  html += '</div>';
-  return html;
+function qAudio(src){
+  if(!src) return '';
+  return `<div class="qAudio"><audio controls preload="none" src="${src}"></audio></div>`;
 }
 
-/* ---- Nghe P1: mỗi câu 3 ảnh riêng A/B/C ---- */
+/* ---- Nghe P1 (câu 1-5): mỗi câu 1 ảnh riêng (đã in sẵn lựa chọn) + 1 audio riêng ---- */
 function renderNgheP1(part){
   const items = part.items;
   const h1 = heading('nghe_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${imageBubbleRow(it.id, it.images)}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
   });
-  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn — cần nghe băng thật để giáo viên bổ sung.</div>`;
+  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Nghe P2: 10 câu chia 2 khối 5 câu, mỗi khối 1 pool ảnh riêng ---- */
+/* ---- Nghe P2 (câu 6-15): y hệt Nghe P1 ---- */
 function renderNgheP2(part){
-  const items = flattenItems(part);
+  const items = part.items;
   const h1 = heading('nghe_p2', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  part.blocks.forEach(block=>{
-    const letters = Object.keys(block.pool).filter(l=>block.pool[l]);
-    h += `<div class="blockWrap">${imagePoolBlock(block.pool)}`;
-    block.items.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, letters, 'letter')}</div>`;
-    });
-    h += '</div>';
+  items.forEach(it=>{
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
   });
-  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn — cần nghe băng thật.</div>`;
+  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Nghe P3: mỗi câu 1 đoạn hội thoại riêng, chọn 1/3 đáp án chữ ---- */
+/* ---- Nghe P3 (câu 16-25): mỗi câu 1 audio riêng + 3 đáp án chữ kèm pinyin ---- */
 function renderNgheP3(part){
   const items = part.items;
   const h1 = heading('nghe_p3', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options, 'text')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${bubbleRow(it.id, it.options, 'text')}</div>`;
   });
-  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn — cần nghe băng thật.</div>`;
+  if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Doc P1: đọc câu, chọn ảnh trong 1 pool ảnh chung ---- */
+/* ---- Doc P1 (câu 26-30): đọc câu, xem ảnh riêng (đã in sẵn lựa chọn) ---- */
 function renderDocP1(part){
   const items = part.items;
   const h1 = heading('doc_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  h += imagePoolBlock(part.pool);
-  const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
   });
   return h;
 }
-/* ---- Doc P2: điền từ vào chỗ trống, chọn từ 1 pool từ vựng chung ---- */
+/* ---- Doc P2 (câu 31-35): điền từ vào chỗ trống, pool từ vựng dùng chung ---- */
 function renderDocP2(part){
   const items = part.items;
   const h1 = heading('doc_p2', items);
@@ -393,7 +352,7 @@ function renderDocP2(part){
   h += '<div class="wordbank ui">';
   Object.keys(part.pool).forEach(l=>{
     if(!part.pool[l]) return;
-    h += `<span><span class="letter">${l}</span>${part.pool[l]}</span>`;
+    h += `<span><span class="letter">${l}</span>${part.pool[l]}${part.poolPinyin[l]?`<span class="py">${part.poolPinyin[l]}</span>`:''}</span>`;
   });
   h += '</div>';
   const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
@@ -402,52 +361,51 @@ function renderDocP2(part){
   });
   return h;
 }
-/* ---- Doc P3: ghép câu/tình huống với câu trả lời, 2 khối 5 câu ---- */
+/* ---- Doc P3 (câu 36-45): ghép câu/tình huống, pool câu trả lời dùng chung ---- */
 function renderDocP3(part){
-  const items = flattenItems(part);
+  const items = part.items;
   const h1 = heading('doc_p3', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  part.blocks.forEach(block=>{
-    const letters = Object.keys(block.pool).filter(l=>block.pool[l]);
-    h += '<div class="blockWrap"><div class="pool">';
-    letters.forEach(l=>{ h += `<div class="item"><span class="letter">${l}</span><span>${block.pool[l]}</span></div>`; });
-    h += '</div>';
-    block.items.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${bubbleRow(it.id, letters, 'letter')}</div>`;
-    });
-    h += '</div>';
+  h += '<div class="pool">';
+  Object.keys(part.pool).forEach(l=>{
+    if(!part.pool[l]) return;
+    h += `<div class="item"><span class="letter">${l}</span><span>${part.pool[l]}${part.poolPinyin[l]?` <span class="py">${part.poolPinyin[l]}</span>`:''}</span></div>`;
+  });
+  h += '</div>';
+  const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
+  items.forEach(it=>{
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}</div>`;
   });
   return h;
 }
-/* ---- Doc P4: đoạn văn + câu hỏi + 3 đáp án ---- */
+/* ---- Doc P4 (câu 46-50): đoạn văn + câu hỏi ★ + 3 đáp án kèm pinyin ---- */
+// Đảm bảo dấu ★ (nếu vì lý do gì đó vẫn còn dính trong đoạn văn, chưa được
+// tách riêng ra) luôn tự xuống dòng khi hiển thị, không bao giờ nằm dính
+// liền vào câu trước đó.
+function starBreak(s){
+  return String(s||'').split('★').join('<br>★ ').replace(/^<br>/, '');
+}
 function renderDocP4(part){
   const items = part.items;
   const h1 = heading('doc_p4', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
-    const questionLine = it.question ? `<div class="qText"><b>* ${it.question}</b></div>` : '';
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${it.passage}</div>${questionLine}${bubbleRow(it.id, it.options, 'text')}</div>`;
+    const questionLine = it.question ? `<div class="qText"><b>★ ${it.question}</b></div>` : '';
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${starBreak(it.passage)}</div>${questionLine}${bubbleRow(it.id, it.options, 'text')}</div>`;
   });
   return h;
 }
-/* ---- Viet P1: chọn bộ thủ đúng, pool bộ thủ chung ---- */
+/* ---- Viet P1 (câu 51-55): mỗi câu 1 ảnh riêng (đã in sẵn từ+pinyin+lựa chọn bộ thủ) ---- */
 function renderVietP1(part){
   const items = part.items;
   const h1 = heading('viet_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  h += '<div class="pool">';
-  Object.keys(part.pool).forEach(l=>{
-    if(!part.pool[l]) return;
-    h += `<div class="item"><span class="letter">${l}</span><span>${part.pool[l]}</span></div>`;
-  });
-  h += '</div>';
-  const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText"><span class="wordBig">${it.word}</span><span class="pinyinSmall">${it.pinyin||''}</span></div>${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
   });
   return h;
 }
-/* ---- Viet P2: viết chữ Hán còn thiếu, có gợi ý phiên âm ---- */
+/* ---- Viet P2 (câu 56-60): viết chữ Hán còn thiếu, có gợi ý phiên âm ---- */
 function renderVietP2(part){
   const items = part.items;
   const h1 = heading('viet_p2', items);
@@ -470,17 +428,9 @@ function allQuestionIds(){
 }
 function renderApp(){
   const app = document.getElementById('app');
-  const linkAudio = DATA.nghe_p1.linkAudio || DATA.nghe_p2.linkAudio || DATA.nghe_p3.linkAudio || '';
   app.innerHTML = `
     <section>
       <h2 class="skillHeading">一、听力<span class="vi">Phần nghe</span></h2>
-      <div class="audioBar ui" id="audioBar">
-        <div><div class="label">🎧 Băng nghe chung Phần 1–3</div>
-        <div class="sub" id="audioSub">${linkAudio ? 'Bấm để bắt đầu — chỉ phát được 1 lần liên tục, không tạm dừng, không tua.' : 'Chưa có link audio cho bài này.'}</div></div>
-        <div class="audioTrack"><div class="fill" id="audioFill"></div></div>
-        <button class="btn" id="playBtn" ${linkAudio?'':'disabled'}>▶ Bắt đầu nghe</button>
-        <button class="btn warn hidden" id="replayBtn">🔁 Nghe lại (–10 điểm)</button>
-      </div>
       <div class="partCard nghe">${renderNgheP1(DATA.nghe_p1)}</div>
       <div class="partCard nghe">${renderNgheP2(DATA.nghe_p2)}</div>
       <div class="partCard nghe">${renderNgheP3(DATA.nghe_p3)}</div>
@@ -498,18 +448,18 @@ function renderApp(){
       <div class="partCard viet">${renderVietP2(DATA.viet_p2)}</div>
     </section>
   `;
-  attachHandlers(linkAudio);
+  attachHandlers();
   updateProgress();
 }
 
 /* ================= EVENTS ================= */
-function attachHandlers(linkAudio){
-  document.querySelectorAll('.bubble[data-qid], .imgBubble[data-qid]').forEach(btn=>{
+function attachHandlers(){
+  document.querySelectorAll('.bubble[data-qid]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       if(submitted) return;
       const qid = btn.dataset.qid, val = btn.dataset.val;
       answers[qid] = val;
-      document.querySelectorAll(`.bubble[data-qid="${qid}"], .imgBubble[data-qid="${qid}"]`).forEach(b=>b.classList.remove('selected'));
+      document.querySelectorAll(`.bubble[data-qid="${qid}"]`).forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       updateProgress();
     });
@@ -518,9 +468,6 @@ function attachHandlers(linkAudio){
     inp.addEventListener('input', ()=>{ answers[inp.dataset.qid] = inp.value.trim(); updateProgress(); });
   });
 
-  const playBtn = document.getElementById('playBtn');
-  if(linkAudio) playBtn.addEventListener('click', startAudio);
-  document.getElementById('replayBtn').addEventListener('click', replayAudio);
   document.getElementById('submitBtn').addEventListener('click', onSubmit);
   document.getElementById('reviewBtn').addEventListener('click', ()=>{
     document.getElementById('resultOverlay').classList.add('hidden');
@@ -537,41 +484,6 @@ function updateProgress(){
   document.getElementById('progressPill').textContent = `${done} / ${ids.length} đã làm`;
   document.getElementById('submitCount').textContent = `Bạn đã làm ${done}/${ids.length} câu`;
 }
-
-/* ================= AUDIO GATING ================= */
-const audioEl = document.getElementById('ngheAudio');
-let audioPlayCount = 0, progressTimer = null;
-function startAudio(){
-  audioEl.src = DATA.nghe_p1.linkAudio || DATA.nghe_p2.linkAudio || DATA.nghe_p3.linkAudio;
-  document.getElementById('playBtn').classList.add('hidden');
-  document.getElementById('audioSub').textContent = 'Đang phát... không thể tạm dừng hoặc tua.';
-  audioPlayCount++;
-  audioEl.currentTime = 0;
-  audioEl.play();
-  progressTimer = setInterval(()=>{
-    if(audioEl.duration){
-      document.getElementById('audioFill').style.width = Math.min(100,(audioEl.currentTime/audioEl.duration)*100)+'%';
-    }
-  }, 150);
-}
-function replayAudio(){
-  const btn = document.getElementById('replayBtn');
-  btn.disabled = true; btn.textContent = 'Đã dùng lượt nghe lại (–10 điểm)';
-  replayUsed = true;
-  document.getElementById('audioSub').textContent = 'Đang nghe lại (lượt cuối cùng)...';
-  audioEl.currentTime = 0; audioEl.play();
-}
-audioEl.addEventListener('ended', ()=>{
-  clearInterval(progressTimer);
-  document.getElementById('audioFill').style.width = '100%';
-  if(!replayUsed){
-    document.getElementById('audioSub').textContent = 'Đã phát xong. Bạn có thể bấm nghe lại 1 lần (sẽ bị trừ 10 điểm).';
-    document.getElementById('replayBtn').classList.remove('hidden');
-  } else {
-    document.getElementById('audioSub').textContent = 'Đã nghe lại xong. Không còn lượt nghe nào nữa.';
-  }
-});
-audioEl.addEventListener('pause', ()=>{ if(!audioEl.ended && audioPlayCount>0) audioEl.play(); });
 
 /* ================= SCORING ================= */
 // Chấm theo thang HSK2 (mô phỏng theo cách làm HSK3): 3 kỹ năng Nghe/Đọc/Viết,
@@ -602,9 +514,8 @@ function computeScore(){
   DATA.viet_p2.items.forEach(it=> tally(viet, it.id, it.answer, (answers[it.id]||'')) );
 
   function sectionScore(b){ return b.total ? Math.round((b.correct/b.total)*100) : null; }
-  let ngheScore = sectionScore(nghe);
+  const ngheScore = sectionScore(nghe);
   const ngheGraded = ngheScore!==null;
-  if(ngheGraded && replayUsed) ngheScore = Math.max(0, ngheScore-10);
   const docScore = sectionScore(doc);
   const vietScore = sectionScore(viet);
 
@@ -622,7 +533,6 @@ function onSubmit(){
   document.getElementById('rowNghe').textContent = r.ngheGraded ? `${r.ngheScore}/100` : 'chưa có đáp án chuẩn';
   document.getElementById('rowDoc').textContent = r.docScore===null ? 'chưa có đáp án chuẩn' : `${r.docScore}/100`;
   document.getElementById('rowViet').textContent = r.vietScore===null ? 'chưa có đáp án chuẩn' : `${r.vietScore}/100`;
-  document.getElementById('rowPenalty').classList.toggle('hidden', !(replayUsed && r.ngheGraded));
   const badge = document.getElementById('hskBadge');
   if(r.complete){
     const passed = r.total >= 180;
@@ -644,7 +554,7 @@ function onSubmit(){
         diemNghe: r.ngheGraded ? r.ngheScore : null,
         diemDoc: r.docScore, diemViet: r.vietScore, tongDiem: r.total,
         dat: r.complete ? (r.total>=180 ? 'Đạt' : 'Chưa đạt') : '',
-        replayUsed: replayUsed, detail: r.detail
+        detail: r.detail
       }
     })
   }).catch(()=>{ /* không chặn UI nếu lỗi mạng — bài đã chấm xong ở phía học sinh */ });
@@ -653,11 +563,6 @@ function revealAnswers(){
   function markBubbles(qid, correctVal){
     if(!correctVal) return;
     document.querySelectorAll(`.bubble[data-qid="${qid}"]`).forEach(b=>{
-      b.disabled = true;
-      if(b.dataset.val===correctVal) b.classList.add('correct');
-      else if(b.classList.contains('selected')) b.classList.add('wrong');
-    });
-    document.querySelectorAll(`.imgBubble[data-qid="${qid}"]`).forEach(b=>{
       b.disabled = true;
       if(b.dataset.val===correctVal) b.classList.add('correct');
       else if(b.classList.contains('selected')) b.classList.add('wrong');
