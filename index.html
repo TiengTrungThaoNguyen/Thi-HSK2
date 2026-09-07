@@ -65,9 +65,15 @@
 
   h2.skillHeading{ font-family:"Noto Serif SC","Noto Serif",serif; font-weight:700; font-size:1.3rem; text-align:center; margin:36px 0 16px; text-wrap:balance; }
   h2.skillHeading .vi{ display:block; font-family:"Be Vietnam Pro",sans-serif; font-weight:600; font-size:.85rem; color:var(--ink-muted); margin-top:2px; }
+  .audioBar{ position:sticky; top:64px; z-index:20; background:var(--surface); border:1px solid var(--border); border-left:5px solid var(--nghe-accent); border-radius:10px; padding:14px 16px; margin-bottom:18px; box-shadow:var(--shadow); font-family:"Be Vietnam Pro",sans-serif; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .audioBar .label{ font-weight:700; font-size:.92rem; }
+  .audioBar .sub{ font-size:.78rem; color:var(--ink-muted); }
+  .audioTrack{ flex:1 1 160px; min-width:120px; height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
+  .audioTrack .fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--brand-dark),var(--brand-bright)); transition:width .2s linear; }
   .btn{ font-family:"Be Vietnam Pro",sans-serif; font-weight:600; font-size:.85rem; border:none; border-radius:8px; padding:9px 16px; cursor:pointer; background:linear-gradient(135deg,var(--brand-dark) 0%,var(--brand) 60%,var(--brand-bright) 130%); color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.3); }
   .btn:hover{ background:var(--brand-dark); }
   .btn:disabled{ background:var(--surface-2); color:var(--ink-muted); cursor:not-allowed; }
+  .btn.warn{ background:var(--warning); }
   .partCard{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 20px 22px; margin-bottom:18px; box-shadow:var(--shadow); }
   .partCard.nghe{ border-top:4px solid var(--nghe-accent); }
   .partCard.doc{ border-top:4px solid var(--doc-accent); }
@@ -76,13 +82,12 @@
   .partHead .zh{ font-weight:700; font-size:1.05rem; }
   .partHead .vi{ font-family:"Be Vietnam Pro",sans-serif; font-size:.85rem; color:var(--ink-muted); margin-top:2px; }
   .qRow{ padding:14px 0; border-top:1px dashed var(--border); }
+  .groupDivider{ border:none; border-top:2px solid var(--border); margin:12px 0; }
   .qRow:first-of-type{ border-top:none; }
   .qNum{ font-weight:700; color:var(--ink-muted); margin-right:6px; font-family:"Be Vietnam Pro",sans-serif; }
   .qText{ margin:4px 0 10px; }
   .qPassage{ background:var(--surface-2); border-radius:8px; padding:10px 14px; margin-bottom:8px; white-space:pre-line; }
   .qPinyin{ font-family:"Be Vietnam Pro",sans-serif; font-size:.8rem; color:var(--ink-muted); margin:2px 0 8px; }
-  .qAudio{ margin:6px 0 10px; }
-  .qAudio audio{ height:32px; width:100%; max-width:320px; }
   .qPicWrap{ border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface-2); margin-bottom:12px; text-align:center; }
   .qPicWrap img{ max-width:100%; max-height:220px; border-radius:6px; display:inline-block; }
   .bubbleRow{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -126,6 +131,7 @@
   .resultCard .score{ font-size:2.6rem; font-weight:700; color:var(--brand); font-variant-numeric:tabular-nums; margin:8px 0 4px;}
   .resultCard .sub{ color:var(--ink-muted); font-size:.88rem; margin-bottom:14px; }
   .resultCard .row{ display:flex; justify-content:space-between; font-size:.9rem; padding:6px 0; border-top:1px dashed var(--border); }
+  .resultCard .row.penalty{ color:var(--danger); font-size:.8rem; border-top:none; padding-top:0; }
   .resultCard .btn{ margin-top:16px; }
   .hskBadge{ display:inline-block; font-weight:700; font-size:.82rem; border-radius:999px; padding:6px 14px; margin:6px 0 12px; }
   .hskBadge.pass{ background:var(--brand-tint); color:var(--brand-dark); }
@@ -178,12 +184,15 @@
     <div class="sub" id="scoreSub">/ 300 điểm</div>
     <div class="hskBadge ui" id="hskBadge"></div>
     <div class="row"><span>听力 Nghe</span><span id="rowNghe">–</span></div>
+    <div class="row penalty hidden" id="rowPenalty"><span>　(đã trừ 10đ vì bấm nghe lại)</span><span></span></div>
     <div class="row"><span>阅读 Đọc</span><span id="rowDoc">–</span></div>
     <div class="row"><span>书写 Viết</span><span id="rowViet">–</span></div>
     <button class="btn ui" id="reviewBtn">Xem lại bài làm &amp; đáp án</button>
     <div class="brandBlock"><div class="brandName">TIẾNG TRUNG THẢO NGUYÊN</div><div class="brandSub">Luyện thi HSK2</div><div class="brandSub">SĐT: 0911.715.999</div></div>
   </div>
 </div>
+
+<audio id="ngheAudio" preload="auto"></audio>
 
 <script>
 /* ================= STATE ================= */
@@ -296,18 +305,19 @@ function qImage(src){
   if(!src) return '';
   return `<div class="qPicWrap"><img src="${src}" alt="Tranh minh hoạ"></div>`;
 }
-function qAudio(src){
-  if(!src) return '';
-  return `<div class="qAudio"><audio controls preload="none" src="${src}"></audio></div>`;
+// Cứ hết 1 nhóm 5 câu thì chèn 1 đường kẻ phân cách rõ hơn (không phải nhóm
+// cuối cùng của phần đó) — dùng cho các phần 10 câu (Nghe-p2, Nghe-p3, Đọc-p3).
+function groupDivider(idx, total){
+  return ((idx+1) % 5 === 0 && idx+1 < total) ? '<hr class="groupDivider">' : '';
 }
 
-/* ---- Nghe P1 (câu 1-5): mỗi câu 1 ảnh riêng (đã in sẵn lựa chọn) + 1 audio riêng ---- */
+/* ---- Nghe P1 (câu 1-5): mỗi câu 1 ảnh riêng (đã in sẵn lựa chọn) — dùng chung 1 băng nghe cho cả phần Nghe ---- */
 function renderNgheP1(part){
   const items = part.items;
   const h1 = heading('nghe_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
@@ -317,19 +327,21 @@ function renderNgheP2(part){
   const items = part.items;
   const h1 = heading('nghe_p2', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+  items.forEach((it,idx)=>{
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+    h += groupDivider(idx, items.length);
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Nghe P3 (câu 16-25): mỗi câu 1 audio riêng + 3 đáp án chữ kèm pinyin ---- */
+/* ---- Nghe P3 (câu 16-25): 3 đáp án chữ kèm pinyin ---- */
 function renderNgheP3(part){
   const items = part.items;
   const h1 = heading('nghe_p3', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qAudio(it.audio)}${bubbleRow(it.id, it.options, 'text')}</div>`;
+  items.forEach((it,idx)=>{
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options, 'text')}</div>`;
+    h += groupDivider(idx, items.length);
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
@@ -373,8 +385,9 @@ function renderDocP3(part){
   });
   h += '</div>';
   const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
-  items.forEach(it=>{
+  items.forEach((it,idx)=>{
     h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += groupDivider(idx, items.length);
   });
   return h;
 }
@@ -428,9 +441,17 @@ function allQuestionIds(){
 }
 function renderApp(){
   const app = document.getElementById('app');
+  const linkAudio = DATA.nghe_p1.linkAudio || DATA.nghe_p2.linkAudio || DATA.nghe_p3.linkAudio || '';
   app.innerHTML = `
     <section>
       <h2 class="skillHeading">一、听力<span class="vi">Phần nghe</span></h2>
+      <div class="audioBar ui" id="audioBar">
+        <div><div class="label">🎧 Băng nghe chung Phần 1–3</div>
+        <div class="sub" id="audioSub">${linkAudio ? 'Bấm để bắt đầu — chỉ phát được 1 lần liên tục, không tạm dừng, không tua.' : 'Chưa có link audio cho bài này.'}</div></div>
+        <div class="audioTrack"><div class="fill" id="audioFill"></div></div>
+        <button class="btn" id="playBtn" ${linkAudio?'':'disabled'}>▶ Bắt đầu nghe</button>
+        <button class="btn warn hidden" id="replayBtn">🔁 Nghe lại (–10 điểm)</button>
+      </div>
       <div class="partCard nghe">${renderNgheP1(DATA.nghe_p1)}</div>
       <div class="partCard nghe">${renderNgheP2(DATA.nghe_p2)}</div>
       <div class="partCard nghe">${renderNgheP3(DATA.nghe_p3)}</div>
@@ -448,12 +469,12 @@ function renderApp(){
       <div class="partCard viet">${renderVietP2(DATA.viet_p2)}</div>
     </section>
   `;
-  attachHandlers();
+  attachHandlers(linkAudio);
   updateProgress();
 }
 
 /* ================= EVENTS ================= */
-function attachHandlers(){
+function attachHandlers(linkAudio){
   document.querySelectorAll('.bubble[data-qid]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       if(submitted) return;
@@ -468,6 +489,9 @@ function attachHandlers(){
     inp.addEventListener('input', ()=>{ answers[inp.dataset.qid] = inp.value.trim(); updateProgress(); });
   });
 
+  const playBtn = document.getElementById('playBtn');
+  if(linkAudio) playBtn.addEventListener('click', startAudio);
+  document.getElementById('replayBtn').addEventListener('click', replayAudio);
   document.getElementById('submitBtn').addEventListener('click', onSubmit);
   document.getElementById('reviewBtn').addEventListener('click', ()=>{
     document.getElementById('resultOverlay').classList.add('hidden');
@@ -484,6 +508,42 @@ function updateProgress(){
   document.getElementById('progressPill').textContent = `${done} / ${ids.length} đã làm`;
   document.getElementById('submitCount').textContent = `Bạn đã làm ${done}/${ids.length} câu`;
 }
+
+/* ================= AUDIO GATING ================= */
+const audioEl = document.getElementById('ngheAudio');
+let audioPlayCount = 0, progressTimer = null;
+let replayUsed = false;
+function startAudio(){
+  audioEl.src = DATA.nghe_p1.linkAudio || DATA.nghe_p2.linkAudio || DATA.nghe_p3.linkAudio;
+  document.getElementById('playBtn').classList.add('hidden');
+  document.getElementById('audioSub').textContent = 'Đang phát... không thể tạm dừng hoặc tua.';
+  audioPlayCount++;
+  audioEl.currentTime = 0;
+  audioEl.play();
+  progressTimer = setInterval(()=>{
+    if(audioEl.duration){
+      document.getElementById('audioFill').style.width = Math.min(100,(audioEl.currentTime/audioEl.duration)*100)+'%';
+    }
+  }, 150);
+}
+function replayAudio(){
+  const btn = document.getElementById('replayBtn');
+  btn.disabled = true; btn.textContent = 'Đã dùng lượt nghe lại (–10 điểm)';
+  replayUsed = true;
+  document.getElementById('audioSub').textContent = 'Đang nghe lại (lượt cuối cùng)...';
+  audioEl.currentTime = 0; audioEl.play();
+}
+audioEl.addEventListener('ended', ()=>{
+  clearInterval(progressTimer);
+  document.getElementById('audioFill').style.width = '100%';
+  if(!replayUsed){
+    document.getElementById('audioSub').textContent = 'Đã phát xong. Bạn có thể bấm nghe lại 1 lần (sẽ bị trừ 10 điểm).';
+    document.getElementById('replayBtn').classList.remove('hidden');
+  } else {
+    document.getElementById('audioSub').textContent = 'Đã nghe lại xong. Không còn lượt nghe nào nữa.';
+  }
+});
+audioEl.addEventListener('pause', ()=>{ if(!audioEl.ended && audioPlayCount>0) audioEl.play(); });
 
 /* ================= SCORING ================= */
 // Chấm theo thang HSK2 (mô phỏng theo cách làm HSK3): 3 kỹ năng Nghe/Đọc/Viết,
@@ -514,8 +574,9 @@ function computeScore(){
   DATA.viet_p2.items.forEach(it=> tally(viet, it.id, it.answer, (answers[it.id]||'')) );
 
   function sectionScore(b){ return b.total ? Math.round((b.correct/b.total)*100) : null; }
-  const ngheScore = sectionScore(nghe);
+  let ngheScore = sectionScore(nghe);
   const ngheGraded = ngheScore!==null;
+  if(ngheGraded && replayUsed) ngheScore = Math.max(0, ngheScore-10);
   const docScore = sectionScore(doc);
   const vietScore = sectionScore(viet);
 
@@ -533,6 +594,7 @@ function onSubmit(){
   document.getElementById('rowNghe').textContent = r.ngheGraded ? `${r.ngheScore}/100` : 'chưa có đáp án chuẩn';
   document.getElementById('rowDoc').textContent = r.docScore===null ? 'chưa có đáp án chuẩn' : `${r.docScore}/100`;
   document.getElementById('rowViet').textContent = r.vietScore===null ? 'chưa có đáp án chuẩn' : `${r.vietScore}/100`;
+  document.getElementById('rowPenalty').classList.toggle('hidden', !(replayUsed && r.ngheGraded));
   const badge = document.getElementById('hskBadge');
   if(r.complete){
     const passed = r.total >= 180;
@@ -554,7 +616,7 @@ function onSubmit(){
         diemNghe: r.ngheGraded ? r.ngheScore : null,
         diemDoc: r.docScore, diemViet: r.vietScore, tongDiem: r.total,
         dat: r.complete ? (r.total>=180 ? 'Đạt' : 'Chưa đạt') : '',
-        detail: r.detail
+        replayUsed: replayUsed, detail: r.detail
       }
     })
   }).catch(()=>{ /* không chặn UI nếu lỗi mạng — bài đã chấm xong ở phía học sinh */ });
