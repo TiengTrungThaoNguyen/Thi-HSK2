@@ -90,6 +90,8 @@
   .qPinyin{ font-family:"Be Vietnam Pro",sans-serif; font-size:.8rem; color:var(--ink-muted); margin:2px 0 8px; }
   .qPicWrap{ border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface-2); margin-bottom:12px; text-align:center; }
   .qPicWrap img{ max-width:100%; max-height:220px; border-radius:6px; display:inline-block; }
+  .qPicWrap.group{ padding:16px; margin-bottom:16px; }
+  .qPicWrap.group img{ max-height:360px; }
   .bubbleRow{ display:flex; flex-wrap:wrap; gap:8px; }
   .bubble{ font-family:"Be Vietnam Pro","Noto Sans SC",sans-serif; font-size:.88rem; font-weight:600; border:1.5px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer; text-align:left; }
   .bubble .py{ display:block; font-size:.72rem; font-weight:500; color:var(--ink-muted); }
@@ -301,35 +303,60 @@ function bubbleRow(qid, options, kind){
   html += '</div>';
   return html;
 }
-function qImage(src){
+function qImage(src, cls){
   if(!src) return '';
-  return `<div class="qPicWrap"><img src="${src}" alt="Tranh minh hoạ"></div>`;
+  return `<div class="qPicWrap${cls?(' '+cls):''}"><img src="${src}" alt="Tranh minh hoạ"></div>`;
 }
 // Cứ hết 1 nhóm 5 câu thì chèn 1 đường kẻ phân cách rõ hơn (không phải nhóm
-// cuối cùng của phần đó) — dùng cho các phần 10 câu (Nghe-p2, Nghe-p3, Đọc-p3).
+// cuối cùng của phần đó) — dùng cho các phần 10 câu (Nghe-p3, Đọc-p3, vốn
+// không có ảnh gộp theo khối).
 function groupDivider(idx, total){
   return ((idx+1) % 5 === 0 && idx+1 < total) ? '<hr class="groupDivider">' : '';
 }
+// Chia mảng câu hỏi thành từng khối 5 câu — dùng cho các phần chỉ cần hiện
+// 1 ẢNH DUY NHẤT (to) ở đầu mỗi khối, sau đó là các câu chỉ còn bong bóng
+// chữ cái (không lặp lại ảnh nhỏ ở mỗi câu) — Nghe-p1, Nghe-p2, Đọc-p1, Viết-p1.
+function chunkBy5(items){
+  const out = [];
+  for(let i=0;i<items.length;i+=5) out.push(items.slice(i,i+5));
+  return out;
+}
+// Hiện 1 ảnh DUY NHẤT (to) cho cả khối — lấy ảnh không rỗng đầu tiên tìm
+// thấy trong khối (thực tế mọi câu trong khối đều được điền cùng 1 ảnh gộp).
+function groupImage(chunk){
+  const img = chunk.map(it=>it.image).find(Boolean) || '';
+  return qImage(img, 'group');
+}
 
-/* ---- Nghe P1 (câu 1-5): mỗi câu 1 ảnh riêng (đã in sẵn lựa chọn) — dùng chung 1 băng nghe cho cả phần Nghe ---- */
+/* ---- Nghe P1 (câu 1-5): 1 ảnh DUY NHẤT cho cả khối 5 câu (đã in sẵn lựa
+   chọn) — dùng chung 1 băng nghe cho cả phần Nghe ---- */
 function renderNgheP1(part){
   const items = part.items;
   const h1 = heading('nghe_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+  const chunks = chunkBy5(items);
+  chunks.forEach((chunk, ci)=>{
+    h += groupImage(chunk);
+    chunk.forEach(it=>{
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+    });
+    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Nghe P2 (câu 6-15): y hệt Nghe P1 ---- */
+/* ---- Nghe P2 (câu 6-15): y hệt Nghe P1, chia 2 khối 5 câu ---- */
 function renderNgheP2(part){
   const items = part.items;
   const h1 = heading('nghe_p2', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach((it,idx)=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
-    h += groupDivider(idx, items.length);
+  const chunks = chunkBy5(items);
+  chunks.forEach((chunk, ci)=>{
+    h += groupImage(chunk);
+    chunk.forEach(it=>{
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+    });
+    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
@@ -346,13 +373,19 @@ function renderNgheP3(part){
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Doc P1 (câu 26-30): đọc câu, xem ảnh riêng (đã in sẵn lựa chọn) ---- */
+/* ---- Doc P1 (câu 26-30): đọc câu, 1 ảnh DUY NHẤT cho cả khối 5 câu (đã in
+   sẵn lựa chọn) ---- */
 function renderDocP1(part){
   const items = part.items;
   const h1 = heading('doc_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+  const chunks = chunkBy5(items);
+  chunks.forEach((chunk, ci)=>{
+    h += groupImage(chunk);
+    chunk.forEach(it=>{
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+    });
+    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
   return h;
 }
@@ -408,13 +441,19 @@ function renderDocP4(part){
   });
   return h;
 }
-/* ---- Viet P1 (câu 51-55): mỗi câu 1 ảnh riêng (đã in sẵn từ+pinyin+lựa chọn bộ thủ) ---- */
+/* ---- Viet P1 (câu 51-55): 1 ảnh DUY NHẤT cho cả khối 5 câu (đã in sẵn
+   từ+pinyin+lựa chọn bộ thủ) ---- */
 function renderVietP1(part){
   const items = part.items;
   const h1 = heading('viet_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${qImage(it.image)}${bubbleRow(it.id, part.options, 'letter')}</div>`;
+  const chunks = chunkBy5(items);
+  chunks.forEach((chunk, ci)=>{
+    h += groupImage(chunk);
+    chunk.forEach(it=>{
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+    });
+    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
   return h;
 }
