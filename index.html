@@ -402,7 +402,7 @@ function renderDocP2(part){
   h += '</div>';
   const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.before}（　）${it.after}</div>${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.before}（　）${it.after}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}</div>`;
   });
   return h;
 }
@@ -436,8 +436,8 @@ function renderDocP4(part){
   const h1 = heading('doc_p4', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
-    const questionLine = it.question ? `<div class="qText"><b>★ ${it.question}</b></div>` : '';
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${starBreak(it.passage)}</div>${questionLine}${bubbleRow(it.id, it.options, 'text')}</div>`;
+    const questionLine = it.question ? `<div class="qText"><b>★ ${it.question}</b>${it.questionPinyin?`<span class="py"> ${it.questionPinyin}</span>`:''}</div>` : '';
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${starBreak(it.passage)}</div>${it.passagePinyin?`<div class="qPinyin">${it.passagePinyin}</div>`:''}${questionLine}${bubbleRow(it.id, it.options, 'text')}</div>`;
   });
   return h;
 }
