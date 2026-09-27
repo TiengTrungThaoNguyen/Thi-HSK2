@@ -8,7 +8,7 @@
   :root{
     --bg:#F3F7EA; --surface:#FFFFFF; --surface-2:#E9F5D4;
     --ink:#16220A; --ink-muted:#55684A;
-    --brand:#4C8C00; --brand-dark:#2B5200; --brand-tint:#E3F4B4; 
+    --brand:#4C8C00; --brand-dark:#2B5200; --brand-tint:#E3F4B4;
     --brand-bright:#C3E600;
     --border:#D6E6C0; --danger:#B23A2E; --danger-tint:#F6E1DD;
     --warning:#8A6D00; --warning-tint:#F1ECC0;
@@ -145,6 +145,10 @@
   .brandBlock{ font-family:"Be Vietnam Pro",sans-serif; text-align:center; margin-top:14px; }
   .brandBlock .brandName{ font-weight:700; font-size:1rem; color:var(--brand-dark); letter-spacing:.02em; }
   .brandBlock .brandSub{ font-size:.78rem; color:var(--ink-muted); margin-top:2px; }
+  .giaiThichBox{ margin-top:10px; background:var(--surface-2); border-left:3px solid var(--nghe-accent); border-radius:8px; padding:10px 14px; font-family:"Be Vietnam Pro",sans-serif; font-size:.85rem; color:var(--ink); }
+  .giaiThichBox .gtLabel{ font-weight:700; color:var(--brand-dark); margin-bottom:4px; }
+  .giaiThichBox .gtText{ white-space:pre-line; }
+  .giaiThichBox audio{ width:100%; margin-top:8px; }
 </style>
 </head>
 <body>
@@ -327,6 +331,12 @@ function groupImage(chunk){
   const img = chunk.map(it=>it.image).find(Boolean) || '';
   return qImage(img, 'group');
 }
+// Khung "Giải thích" (MỚI) — luôn render sẵn nhưng để ẩn (.hidden); sau khi
+// nộp bài, revealAnswers() sẽ tự điền nội dung + audio (nếu có) và bỏ ẩn,
+// CHỈ với câu học sinh làm SAI hoặc bỏ trống — làm đúng thì không hiện.
+function giaiThichBox(qid){
+  return `<div class="giaiThichBox hidden" id="gt-${qid}"></div>`;
+}
 
 /* ---- Nghe P1 (câu 1-5): 1 ảnh DUY NHẤT cho cả khối 5 câu (đã in sẵn lựa
    chọn) — dùng chung 1 băng nghe cho cả phần Nghe ---- */
@@ -338,7 +348,7 @@ function renderNgheP1(part){
   chunks.forEach((chunk, ci)=>{
     h += groupImage(chunk);
     chunk.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
     if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
@@ -354,7 +364,7 @@ function renderNgheP2(part){
   chunks.forEach((chunk, ci)=>{
     h += groupImage(chunk);
     chunk.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
     if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
@@ -367,7 +377,7 @@ function renderNgheP3(part){
   const h1 = heading('nghe_p3', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach((it,idx)=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options, 'text')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options, 'text')}${giaiThichBox(it.id)}</div>`;
     h += groupDivider(idx, items.length);
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
@@ -383,7 +393,7 @@ function renderDocP1(part){
   chunks.forEach((chunk, ci)=>{
     h += groupImage(chunk);
     chunk.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
     if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
@@ -402,7 +412,7 @@ function renderDocP2(part){
   h += '</div>';
   const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
   items.forEach(it=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.before}（　）${it.after}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.before}（　）${it.after}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}${giaiThichBox(it.id)}</div>`;
   });
   return h;
 }
@@ -419,7 +429,7 @@ function renderDocP3(part){
   h += '</div>';
   const letters = Object.keys(part.pool).filter(l=>part.pool[l]);
   items.forEach((it,idx)=>{
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, letters, 'letter')}${giaiThichBox(it.id)}</div>`;
     h += groupDivider(idx, items.length);
   });
   return h;
@@ -437,7 +447,7 @@ function renderDocP4(part){
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   items.forEach(it=>{
     const questionLine = it.question ? `<div class="qText"><b>★ ${it.question}</b>${it.questionPinyin?`<span class="py"> ${it.questionPinyin}</span>`:''}</div>` : '';
-    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${starBreak(it.passage)}</div>${it.passagePinyin?`<div class="qPinyin">${it.passagePinyin}</div>`:''}${questionLine}${bubbleRow(it.id, it.options, 'text')}</div>`;
+    h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qPassage">${starBreak(it.passage)}</div>${it.passagePinyin?`<div class="qPinyin">${it.passagePinyin}</div>`:''}${questionLine}${bubbleRow(it.id, it.options, 'text')}${giaiThichBox(it.id)}</div>`;
   });
   return h;
 }
@@ -451,7 +461,7 @@ function renderVietP1(part){
   chunks.forEach((chunk, ci)=>{
     h += groupImage(chunk);
     chunk.forEach(it=>{
-      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}</div>`;
+      h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
     if(ci < chunks.length-1) h += '<hr class="groupDivider">';
   });
@@ -469,6 +479,7 @@ function renderVietP2(part){
     h += `<div class="qRow"><span class="qNum">${it.id}.</span>
       ${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}
       <div class="fillLine">${it.before}<span class="pinyinWrap"><span class="py">${it.blankPinyin||''}</span><span class="blankRow">（<input type="text" maxlength="3" class="hanziInput" data-qid="${it.id}" autocomplete="off">）</span></span>${it.after}</div>
+      ${giaiThichBox(it.id)}
     </div>`;
   });
   return h;
@@ -664,6 +675,21 @@ function onSubmit(){
     })
   }).catch(()=>{ /* không chặn UI nếu lỗi mạng — bài đã chấm xong ở phía học sinh */ });
 }
+// Chỉ hiện "Giải thích" khi học sinh làm SAI câu đó (hoặc bỏ trống) — làm
+// đúng thì ẩn đi, giữ đúng quy tắc đã áp dụng thống nhất cho HSK1/HSK3.
+function showGiaiThich(qid, correctVal, giaiThich, giaiThichAudio, wasWrongOverride){
+  const box = document.getElementById('gt-'+qid);
+  if(!box) return;
+  if(!correctVal) return; // câu chưa có đáp án chuẩn thì không xét đúng/sai
+  const wasWrong = (wasWrongOverride !== undefined) ? wasWrongOverride : (answers[qid] !== correctVal);
+  if(!wasWrong) return;
+  if(!giaiThich && !giaiThichAudio) return;
+  let html = '<div class="gtLabel">💡 Giải thích</div>';
+  if(giaiThich) html += `<div class="gtText">${String(giaiThich).replace(/\n/g,'<br>')}</div>`;
+  if(giaiThichAudio) html += `<audio controls preload="none" src="${giaiThichAudio}"></audio>`;
+  box.innerHTML = html;
+  box.classList.remove('hidden');
+}
 function revealAnswers(){
   function markBubbles(qid, correctVal){
     if(!correctVal) return;
@@ -674,7 +700,10 @@ function revealAnswers(){
     });
   }
   ['nghe_p1','nghe_p2','nghe_p3','doc_p1','doc_p2','doc_p3','doc_p4','viet_p1'].forEach(k=>{
-    flattenItems(DATA[k]).forEach(it=>markBubbles(it.id, it.answer));
+    flattenItems(DATA[k]).forEach(it=>{
+      markBubbles(it.id, it.answer);
+      showGiaiThich(it.id, it.answer, it.giaiThich, it.giaiThichAudio);
+    });
   });
   DATA.viet_p2.items.forEach(it=>{
     const inp = document.querySelector(`.hanziInput[data-qid="${it.id}"]`);
@@ -692,6 +721,7 @@ function revealAnswers(){
     hint.className = 'answerHint ui '+(ok?'correct':'wrong');
     hint.textContent = ok ? '✓ đúng' : `✕ đáp án đúng: ${it.answer}`;
     inp.insertAdjacentElement('afterend', hint);
+    showGiaiThich(it.id, it.answer, it.giaiThich, it.giaiThichAudio, !ok);
   });
 }
 </script>
