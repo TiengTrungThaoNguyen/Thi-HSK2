@@ -144,6 +144,8 @@
   .resultCard .row{ display:flex; justify-content:space-between; font-size:.9rem; padding:6px 0; border-top:1px dashed var(--border); }
   .resultCard .row.penalty{ color:var(--danger); font-size:.8rem; border-top:none; padding-top:0; }
   .resultCard .btn{ margin-top:16px; }
+  .submitFailNote{ margin-top:12px; padding:10px 12px; border-radius:8px; background:#fdecea; color:#a83232; font-size:.82rem; text-align:left; line-height:1.4; }
+  .submitFailNote.hidden{ display:none; }
   .hskBadge{ display:inline-block; font-weight:700; font-size:.82rem; border-radius:999px; padding:6px 14px; margin:6px 0 12px; }
   .hskBadge.pass{ background:var(--brand-tint); color:var(--brand-dark); }
   .hskBadge.fail{ background:var(--danger-tint); color:var(--danger); }
@@ -202,6 +204,7 @@
     <div class="row penalty hidden" id="rowPenalty"><span>　(đã trừ 10đ vì bấm nghe lại)</span><span></span></div>
     <div class="row"><span>阅读 Đọc</span><span id="rowDoc">–</span></div>
     <div class="row"><span>书写 Viết</span><span id="rowViet">–</span></div>
+    <div class="submitFailNote hidden" id="submitFailNote">⚠️ Chưa lưu được kết quả vào hệ thống (lỗi kết nối/máy chủ). Vui lòng chụp lại màn hình điểm này và báo cho giáo viên.</div>
     <button class="btn ui" id="reviewBtn">Xem lại bài làm &amp; đáp án</button>
     <div class="brandBlock"><div class="brandName">TIẾNG TRUNG THẢO NGUYÊN</div><div class="brandSub">Luyện thi HSK2</div><div class="brandSub">SĐT: 0911.715.999</div></div>
   </div>
@@ -698,7 +701,23 @@ function onSubmit(){
         replayUsed: replayUsed, detail: r.detail
       }
     })
-  }).catch(()=>{ /* không chặn UI nếu lỗi mạng — bài đã chấm xong ở phía học sinh */ });
+  })
+    // Không chặn UI nếu lỗi (bài đã chấm xong ở phía học sinh), nhưng PHẢI
+    // đọc JSON trả về để biết máy chủ (Apps Script) có thực sự ghi được vào
+    // Sheet hay không — trước đây chỉ .catch() nên lỗi phía máy chủ (vẫn trả
+    // HTTP 200 kèm {ok:false}) bị bỏ qua hoàn toàn, học sinh tưởng đã nộp
+    // xong nhưng Sheet không hề nhận được dữ liệu.
+    .then(r=>r.json())
+    .then(res=>{
+      if(!res || !res.ok){
+        console.error('Nộp bài thất bại phía máy chủ:', res && res.error);
+        document.getElementById('submitFailNote').classList.remove('hidden');
+      }
+    })
+    .catch(err=>{
+      console.error('Lỗi khi gửi kết quả:', err);
+      document.getElementById('submitFailNote').classList.remove('hidden');
+    });
 }
 // Chỉ hiện "Giải thích" khi học sinh làm SAI câu đó (hoặc bỏ trống) — làm
 // đúng thì ẩn đi, giữ đúng quy tắc đã áp dụng thống nhất cho HSK1/HSK3.
