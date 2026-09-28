@@ -99,6 +99,8 @@
   .qPicWrap img{ max-width:100%; max-height:220px; border-radius:6px; display:inline-block; }
   .qPicWrap.group{ padding:16px; margin-bottom:16px; }
   .qPicWrap.group img{ max-height:360px; }
+  /* Riêng ảnh phần Nghe (Nghe-1, Nghe-2) to hơn ảnh phần Đọc/Viết một chút theo yêu cầu — Đọc-1, Viết-1 vẫn giữ nguyên kích thước cũ. */
+  .qPicWrap.group.nghe img{ max-height:440px; }
   .bubbleRow{ display:flex; flex-wrap:wrap; gap:8px; }
   .bubble{ font-family:"Be Vietnam Pro","Noto Sans SC",sans-serif; font-size:.88rem; font-weight:600; border:1.5px solid var(--border); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer; text-align:left; }
   .bubble .py{ display:block; font-size:.72rem; font-weight:500; color:var(--ink-muted); }
@@ -335,9 +337,9 @@ function chunkBy5(items){
 }
 // Hiện 1 ảnh DUY NHẤT (to) cho cả khối — lấy ảnh không rỗng đầu tiên tìm
 // thấy trong khối (thực tế mọi câu trong khối đều được điền cùng 1 ảnh gộp).
-function groupImage(chunk){
+function groupImage(chunk, extraClass){
   const img = chunk.map(it=>it.image).find(Boolean) || '';
-  return qImage(img, 'group');
+  return qImage(img, 'group' + (extraClass?(' '+extraClass):''));
 }
 // Khung "Giải thích" (MỚI) — luôn render sẵn nhưng để ẩn (.hidden); sau khi
 // nộp bài, revealAnswers() sẽ tự điền nội dung + audio (nếu có) và bỏ ẩn,
@@ -354,7 +356,7 @@ function renderNgheP1(part){
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   const chunks = chunkBy5(items);
   chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk);
+    h += groupImage(chunk, 'nghe');
     chunk.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
@@ -370,7 +372,7 @@ function renderNgheP2(part){
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
   const chunks = chunkBy5(items);
   chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk);
+    h += groupImage(chunk, 'nghe');
     chunk.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
