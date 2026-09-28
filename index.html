@@ -639,7 +639,18 @@ function computeScore(){
   ['viet_p1'].forEach(k=>{
     flattenItems(DATA[k]).forEach(it=> tally(viet, it.id, it.answer, answers[it.id]) );
   });
-  DATA.viet_p2.items.forEach(it=> tally(viet, it.id, it.answer, (answers[it.id]||'')) );
+  // Viet_P2 (nhìn phiên âm viết chữ Hán) là phần "tự luận" — ghi ĐẦY ĐỦ vào
+  // Chi_Tiết (cả câu đúng lẫn câu sai), khác với các phần trắc nghiệm ở trên
+  // chỉ ghi câu sai, để cô giáo xem lại toàn bộ chữ Hán học sinh đã viết.
+  DATA.viet_p2.items.forEach(it=>{
+    const ansVal = it.answer;
+    const chosenVal = answers[it.id] || '';
+    if(!ansVal) return;
+    viet.total++;
+    const ok = chosenVal===ansVal;
+    if(ok) viet.correct++;
+    detail[it.id] = { chon: chosenVal || '(bỏ trống)', dung: ansVal, ketQua: ok ? 'Đúng' : 'Sai' };
+  });
 
   function sectionScore(b){ return b.total ? Math.round((b.correct/b.total)*100) : null; }
   let ngheScore = sectionScore(nghe);
