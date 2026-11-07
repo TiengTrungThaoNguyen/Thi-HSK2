@@ -330,19 +330,30 @@ function qImage(src, cls){
 function groupDivider(idx, total){
   return ((idx+1) % 5 === 0 && idx+1 < total) ? '<hr class="groupDivider">' : '';
 }
-// Chia mảng câu hỏi thành từng khối 5 câu — dùng cho các phần chỉ cần hiện
-// 1 ẢNH DUY NHẤT (to) ở đầu mỗi khối, sau đó là các câu chỉ còn bong bóng
-// chữ cái (không lặp lại ảnh nhỏ ở mỗi câu) — Nghe-p1, Nghe-p2, Đọc-p1, Viết-p1.
-function chunkBy5(items){
-  const out = [];
-  for(let i=0;i<items.length;i+=5) out.push(items.slice(i,i+5));
-  return out;
+// Gộp các câu LIÊN TIẾP dùng CHUNG đúng 1 ảnh (so khớp y hệt URL ảnh) thành
+// 1 khối hiển thị ẢNH DUY NHẤT (to) ở đầu khối, sau đó là các câu chỉ còn
+// bong bóng chữ cái (không lặp lại ảnh nhỏ ở mỗi câu) — dùng cho Nghe-p1,
+// Nghe-p2, Đọc-p1, Viết-p1.
+//
+// QUAN TRỌNG: KHÔNG chia cứng theo "mỗi khối đúng 5 câu" (cách làm cũ) — vì
+// thực tế 1 khối 5 câu có thể dùng tới 2 (hoặc nhiều hơn) ảnh khác nhau bên
+// trong (ví dụ Bài 16 phần Nghe-P2: 5 câu nhưng câu 1-3 dùng ảnh A, câu 4-5
+// dùng ảnh B khác hẳn). Cách chia cứng cũ chỉ lấy ảnh không-rỗng ĐẦU TIÊN
+// tìm thấy trong cả khối rồi dùng chung cho tất cả 5 câu, khiến ảnh B (của
+// câu 4-5) bị bỏ mất hoàn toàn. Gộp theo đúng ranh giới ảnh THẬT thay đổi ở
+// đâu thì mới luôn hiện đủ, dù 1 khối có 1, 2 hay nhiều ảnh khác nhau.
+function groupByImage(items){
+  const groups = [];
+  items.forEach(it=>{
+    const key = it.image || '';
+    const last = groups[groups.length-1];
+    if(last && last.key === key) last.items.push(it);
+    else groups.push({ key: key, items: [it] });
+  });
+  return groups;
 }
-// Hiện 1 ảnh DUY NHẤT (to) cho cả khối — lấy ảnh không rỗng đầu tiên tìm
-// thấy trong khối (thực tế mọi câu trong khối đều được điền cùng 1 ảnh gộp).
-function groupImage(chunk, extraClass){
-  const img = chunk.map(it=>it.image).find(Boolean) || '';
-  return qImage(img, 'group' + (extraClass?(' '+extraClass):''));
+function groupImage(group, extraClass){
+  return qImage(group.key, 'group' + (extraClass?(' '+extraClass):''));
 }
 // Khung "Giải thích" (MỚI) — luôn render sẵn nhưng để ẩn (.hidden); sau khi
 // nộp bài, revealAnswers() sẽ tự điền nội dung + audio (nếu có) và bỏ ẩn,
@@ -357,29 +368,29 @@ function renderNgheP1(part){
   const items = part.items;
   const h1 = heading('nghe_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  const chunks = chunkBy5(items);
-  chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk, 'nghe');
-    chunk.forEach(it=>{
+  const groups = groupByImage(items);
+  groups.forEach((g, gi)=>{
+    h += groupImage(g, 'nghe');
+    g.items.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
-    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
+    if(gi < groups.length-1) h += '<hr class="groupDivider">';
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
 }
-/* ---- Nghe P2 (câu 6-15): y hệt Nghe P1, chia 2 khối 5 câu ---- */
+/* ---- Nghe P2 (câu 6-15): y hệt Nghe P1 ---- */
 function renderNgheP2(part){
   const items = part.items;
   const h1 = heading('nghe_p2', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  const chunks = chunkBy5(items);
-  chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk, 'nghe');
-    chunk.forEach(it=>{
+  const groups = groupByImage(items);
+  groups.forEach((g, gi)=>{
+    h += groupImage(g, 'nghe');
+    g.items.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
-    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
+    if(gi < groups.length-1) h += '<hr class="groupDivider">';
   });
   if(items.some(it=>!it.answer)) h += `<div class="tbdNote">⏳ Một số câu chưa có đáp án chuẩn.</div>`;
   return h;
@@ -402,13 +413,13 @@ function renderDocP1(part){
   const items = part.items;
   const h1 = heading('doc_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  const chunks = chunkBy5(items);
-  chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk);
-    chunk.forEach(it=>{
+  const groups = groupByImage(items);
+  groups.forEach((g, gi)=>{
+    h += groupImage(g);
+    g.items.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span><div class="qText">${it.text}</div>${it.pinyin?`<div class="qPinyin">${it.pinyin}</div>`:''}${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
-    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
+    if(gi < groups.length-1) h += '<hr class="groupDivider">';
   });
   return h;
 }
@@ -470,13 +481,13 @@ function renderVietP1(part){
   const items = part.items;
   const h1 = heading('viet_p1', items);
   let h = `<div class="partHead"><div class="zh">${h1.zh}</div><div class="vi ui">${h1.vi}</div></div>`;
-  const chunks = chunkBy5(items);
-  chunks.forEach((chunk, ci)=>{
-    h += groupImage(chunk);
-    chunk.forEach(it=>{
+  const groups = groupByImage(items);
+  groups.forEach((g, gi)=>{
+    h += groupImage(g);
+    g.items.forEach(it=>{
       h += `<div class="qRow"><span class="qNum">${it.id}.</span>${bubbleRow(it.id, it.options || part.options, 'letter')}${giaiThichBox(it.id)}</div>`;
     });
-    if(ci < chunks.length-1) h += '<hr class="groupDivider">';
+    if(gi < groups.length-1) h += '<hr class="groupDivider">';
   });
   return h;
 }
