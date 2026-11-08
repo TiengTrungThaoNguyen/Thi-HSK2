@@ -182,6 +182,7 @@
       <select id="lessonSelect"><option value="">Đang tải danh sách bài...</option></select>
     </div>
     <button class="btn ui" id="startBtn" disabled>Bắt đầu làm bài</button>
+    <p class="sub ui hidden" id="approvalMsg" style="margin-top:10px;font-weight:600;"></p>
     <div class="brandBlock"><div class="brandName">TIẾNG TRUNG THẢO NGUYÊN</div><div class="brandSub">Luyện thi HSK2</div><div class="brandSub">SĐT: 0911.715.999</div></div>
   </div>
 
@@ -216,7 +217,7 @@
 /* ================= STATE ================= */
 // Link Web App (Apps Script) đã Deploy cho hệ thống HSK2 — sửa lại đúng link
 // của bạn sau khi Deploy Code_HSK2.gs.
-const API_URL = 'https://script.google.com/macros/s/AKfycbw9I7ZQ2gvlykQZQStSJS34jZfKSsFTxzHZE2RU6Z_oz_rqMv0msCgwl-CnKOm9hEnB/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyT--W2PZw4LnptzKQU0OZ78EXkQGw1LuJuiPE-l6PCUw9HyGysfplQkUQuQ8Sp9XaokQ/exec';
 let DATA = null;
 let currentLesson = '';
 let hoTen = '';
@@ -274,16 +275,46 @@ document.getElementById('startBtn').addEventListener('click', ()=>{
   currentLesson = document.getElementById('lessonSelect').value;
   if(!currentLesson) return;
   const startBtn = document.getElementById('startBtn');
+  const approvalMsg = document.getElementById('approvalMsg');
+  if(!hoTen || !hoTen.trim()){
+    approvalMsg.textContent = 'Vui lòng nhập họ tên trước khi bắt đầu.';
+    approvalMsg.classList.remove('hidden');
+    return;
+  }
+  approvalMsg.classList.add('hidden');
+  approvalMsg.textContent = '';
   startBtn.disabled = true;
-  startBtn.textContent = 'Đang tải đề...';
-  fetch(API_URL + '?action=exam&bai=' + encodeURIComponent(currentLesson))
+  startBtn.textContent = 'Đang kiểm tra...';
+  // Trước khi vào đề: kiểm tra học sinh này đã được giáo viên duyệt chưa.
+  // Lần đầu nhập tên -> hệ thống tự ghi tên vào danh sách chờ duyệt, học
+  // sinh phải chờ giáo viên duyệt (ở tab "HocSinh" trong Google Sheet) rồi
+  // mới bấm lại để vào làm bài; những lần sau (đã được duyệt) vào thẳng.
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'checkApproved', hoTen: hoTen.trim() })
+  })
     .then(r=>r.json())
     .then(res=>{
-      if(!res.ok) throw new Error(res.error || 'Không tải được đề bài');
-      onDataLoaded(res.data);
+      if(!res.ok) throw new Error(res.error || 'Không kiểm tra được trạng thái duyệt');
+      if(!res.approved){
+        approvalMsg.textContent = res.status === 'new'
+          ? 'Tên của bạn đã được gửi tới cô giáo. Vui lòng chờ cô duyệt rồi quay lại bấm "Bắt đầu làm bài".'
+          : 'Bạn chưa được cô giáo duyệt. Vui lòng chờ duyệt rồi quay lại bấm "Bắt đầu làm bài".';
+        approvalMsg.classList.remove('hidden');
+        startBtn.disabled = false;
+        startBtn.textContent = 'Bắt đầu làm bài';
+        return;
+      }
+      startBtn.textContent = 'Đang tải đề...';
+      return fetch(API_URL + '?action=exam&bai=' + encodeURIComponent(currentLesson))
+        .then(r=>r.json())
+        .then(res2=>{
+          if(!res2.ok) throw new Error(res2.error || 'Không tải được đề bài');
+          onDataLoaded(res2.data);
+        });
     })
     .catch(err=>{
-      alert('Lỗi tải đề: '+err.message);
+      alert('Lỗi: '+err.message);
       startBtn.disabled = false;
       startBtn.textContent = 'Bắt đầu làm bài';
     });
